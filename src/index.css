@@ -93,12 +93,13 @@ body {
 
 .ProseMirror ul[data-type="taskList"] li {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5em;
 }
 
 .ProseMirror ul[data-type="taskList"] li label {
-  margin-top: 0.25em;
+  display: flex;
+  align-items: center;
 }
 
 .ProseMirror ul[data-type="taskList"] li label input[type="checkbox"] {
