@@ -5,6 +5,9 @@ import { resolve } from 'path'
 
 export default defineConfig({
   base: '/dodoco-memo/',
+  build: {
+    outDir: 'docs',
+  },
   plugins: [
     react(),
     VitePWA({
