@@ -1,0 +1,11 @@
+{
+  "name": "嘟嘟可备忘录",
+  "short_name": "嘟嘟可",
+  "description": "和可莉一起记录每一天",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#D4443B",
+  "background_color": "#FFF8F0",
+  "icons": []
+}

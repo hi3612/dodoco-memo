@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-klee-red: #D4443B;
+  --color-klee-gold: #F5D062;
+  --color-klee-cream: #FFF8F0;
+  --color-klee-brown: #3D2C1E;
+  --color-klee-green: #7EC87B;
+  --color-klee-darkBg: #1A1410;
+
+  --color-note-default: #FFFEF9;
+  --color-note-pyro: #FDE8E3;
+  --color-note-hydro: #E0F0FB;
+  --color-note-anemo: #E0F5F0;
+  --color-note-electro: #EDE0F7;
+  --color-note-dendro: #E8F5E0;
+  --color-note-cryo: #E3F2FA;
+  --color-note-geo: #FDF3E0;
+
+  --font-family-sans: "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --radius-card: 16px;
+
+  --max-width-mobile: 448px;
+}
+
+/* 可莉主题全局样式 */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+  background-color: var(--color-klee-cream);
+  color: var(--color-klee-brown);
+  overscroll-behavior: none;
+}
+
+.dark body {
+  background-color: var(--color-klee-darkBg);
+  color: #fff;
+}
+
+::selection {
+  background-color: var(--color-klee-gold);
+  color: var(--color-klee-brown);
+}
+
+.dark ::selection {
+  background-color: var(--color-klee-red);
+  color: #fff;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+}
+
+/* TipTap 编辑器样式 */
+.ProseMirror {
+  outline: none !important;
+  min-height: 200px;
+}
+
+.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5em;
+}
+
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.ProseMirror ul[data-type="taskList"] li label {
+  margin-top: 0.25em;
+}
+
+.ProseMirror ul[data-type="taskList"] li label input[type="checkbox"] {
+  cursor: pointer;
+  width: 1em;
+  height: 1em;
+  accent-color: var(--color-klee-red);
+}
+
+.ProseMirror a {
+  color: var(--color-klee-red);
+  text-decoration: underline;
+}
+
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+  margin: 0.75em 0 0.25em;
+  line-height: 1.3;
+}
+
+/* 卡片入场动画 */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.break-inside-avoid {
+  animation: cardIn 0.3s ease-out both;
+}
+
+/* 输入框样式重置 */
+input, textarea {
+  background: transparent;
+}
