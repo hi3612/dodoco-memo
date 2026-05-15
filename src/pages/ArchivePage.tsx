@@ -48,21 +48,23 @@ export function ArchivePage() {
 
   const handleRestore = async () => {
     await batchUnarchiveNotes(Array.from(selectedIds))
+    cancelSelect()
     refreshNotes()
     refreshTags()
-    setNotes(prev => prev.filter(n => !selectedIds.has(n.id!)))
+    const updated = await getArchivedNotes()
+    setNotes(updated)
     showToast(`已恢复 ${selectedIds.size} 条笔记`)
-    cancelSelect()
   }
 
   const handleBatchDelete = async () => {
     await batchTrashNotes(Array.from(selectedIds))
-    refreshNotes()
-    refreshTags()
-    setNotes(prev => prev.filter(n => !selectedIds.has(n.id!)))
-    showToast(`已删除 ${selectedIds.size} 条笔记`)
     cancelSelect()
     setShowBatchDelete(false)
+    refreshNotes()
+    refreshTags()
+    const updated = await getArchivedNotes()
+    setNotes(updated)
+    showToast(`已删除 ${selectedIds.size} 条笔记`)
   }
 
   return (

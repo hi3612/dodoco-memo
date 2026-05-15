@@ -48,21 +48,23 @@ export function TrashPage() {
 
   const handleRestore = async () => {
     await batchRestoreNotes(Array.from(selectedIds))
+    cancelSelect()
     refreshNotes()
     refreshTags()
-    setNotes(prev => prev.filter(n => !selectedIds.has(n.id!)))
+    const updated = await getTrashedNotes()
+    setNotes(updated)
     showToast(`已恢复 ${selectedIds.size} 条笔记`)
-    cancelSelect()
   }
 
   const handleBatchDelete = async () => {
     await batchDeleteForever(Array.from(selectedIds))
-    refreshNotes()
-    refreshTags()
-    setNotes(prev => prev.filter(n => !selectedIds.has(n.id!)))
-    showToast(`已永久删除 ${selectedIds.size} 条笔记`)
     cancelSelect()
     setShowBatchDelete(false)
+    refreshNotes()
+    refreshTags()
+    const updated = await getTrashedNotes()
+    setNotes(updated)
+    showToast(`已永久删除 ${selectedIds.size} 条笔记`)
   }
 
   return (

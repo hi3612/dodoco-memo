@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { Trash2, X, Archive, Undo2 } from 'lucide-react'
 
 interface SelectionBarProps {
@@ -11,8 +12,8 @@ interface SelectionBarProps {
 }
 
 export function SelectionBar({ count, onDelete, onCancel, onArchive, onRestore, deleteLabel = '删除', secondLabel = '归档' }: SelectionBarProps) {
-  return (
-    <div className="fixed bottom-14 left-0 right-0 z-50 flex justify-center pointer-events-none">
+  return createPortal(
+    <div className="fixed bottom-14 left-0 right-0 z-[999] flex justify-center pointer-events-none">
       <div className="mx-4 w-full max-w-mobile bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between pointer-events-auto">
         <div className="flex items-center gap-2">
           <button onClick={onCancel} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -38,6 +39,7 @@ export function SelectionBar({ count, onDelete, onCancel, onArchive, onRestore, 
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
