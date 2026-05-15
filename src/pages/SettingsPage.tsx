@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sun, Moon, Grid3X3, List, Archive, Trash2, Download, Upload, Trash } from 'lucide-react'
 import { TopBar } from '@/components/layout/TopBar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { CloverIcon } from '@/components/ui/CloverIcon'
+import { KleeAvatar } from '@/components/ui/KleeAvatar'
 import { showToast } from '@/components/ui/Toast'
 import { useUIStore } from '@/stores/uiStore'
 import { useNoteStore } from '@/stores/noteStore'
@@ -140,7 +140,7 @@ export function SettingsPage() {
 
         {/* App Info */}
         <div className="pt-6 text-center">
-          <CloverIcon size={36} className="mx-auto" />
+          <KleeAvatar size={36} className="mx-auto" />
           <p className="text-xs text-gray-400 mt-1">嘟嘟可备忘录 v1.0</p>
           <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">和可莉一起记录每一天 ✨</p>
         </div>

@@ -4,7 +4,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { SearchBar } from '@/components/search/SearchBar'
 import { NoteGrid } from '@/components/notes/NoteGrid'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { CloverIcon } from '@/components/ui/CloverIcon'
+import { KleeAvatar } from '@/components/ui/KleeAvatar'
 import { useSearch } from '@/hooks/useSearch'
 import { useDebounce } from '@/hooks/useDebounce'
 
@@ -32,7 +32,7 @@ export function SearchPage() {
         <div className="mt-4">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <span className="animate-spin"><CloverIcon size={32} /></span>
+              <span className="animate-spin"><KleeAvatar size={32} /></span>
             </div>
           ) : query.trim() ? (
             results.length > 0 ? (
@@ -41,10 +41,10 @@ export function SearchPage() {
                 <NoteGrid notes={results} />
               </>
             ) : (
-              <EmptyState icon={<CloverIcon size={72} />} title="没有找到相关笔记" description="试试换个关键词吧" />
+              <EmptyState icon={<KleeAvatar size={72} />} title="没有找到相关笔记" description="试试换个关键词吧" />
             )
           ) : (
-            <EmptyState icon={<CloverIcon size={72} />} title="输入关键词搜索" description="搜索笔记的标题和内容" />
+            <EmptyState icon={<KleeAvatar size={72} />} title="输入关键词搜索" description="搜索笔记的标题和内容" />
           )}
         </div>
       </div>

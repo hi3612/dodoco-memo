@@ -8,7 +8,7 @@ import { NoteCard } from '@/components/notes/NoteCard'
 import { SelectionBar } from '@/components/notes/SelectionBar'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { CloverIcon } from '@/components/ui/CloverIcon'
+import { KleeAvatar } from '@/components/ui/KleeAvatar'
 import { batchTrashNotes, batchArchiveNotes } from '@/db/operations'
 import { showToast } from '@/components/ui/Toast'
 export function HomePage() {
@@ -90,11 +90,11 @@ export function HomePage() {
       <div className="pb-6">
         {loading && notes.length === 0 ? (
           <div className="flex items-center justify-center py-20">
-            <span className="animate-bounce"><CloverIcon size={48} /></span>
+            <span className="animate-bounce"><KleeAvatar size={48} /></span>
           </div>
         ) : notes.length === 0 && pinnedNotes.length === 0 ? (
           <EmptyState
-            icon={<CloverIcon size={72} />}
+            icon={<KleeAvatar size={72} />}
             title="还没有笔记哦"
             description="点击右上角 + 号，和可莉一起记录吧！"
           />

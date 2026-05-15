@@ -5,7 +5,7 @@ import { NoteCard } from '@/components/notes/NoteCard'
 import { SelectionBar } from '@/components/notes/SelectionBar'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { CloverIcon } from '@/components/ui/CloverIcon'
+import { KleeAvatar } from '@/components/ui/KleeAvatar'
 import { showToast } from '@/components/ui/Toast'
 import { useTagStore } from '@/stores/tagStore'
 import { useNoteStore } from '@/stores/noteStore'
@@ -78,10 +78,10 @@ export function TagsPage() {
       <div className="px-4 pb-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <span className="animate-spin"><CloverIcon size={32} /></span>
+            <span className="animate-spin"><KleeAvatar size={32} /></span>
           </div>
         ) : tags.length === 0 ? (
-          <EmptyState icon={<CloverIcon size={72} />} title="还没有标签" description="在编辑笔记时添加标签，就能在这里看到啦" />
+          <EmptyState icon={<KleeAvatar size={72} />} title="还没有标签" description="在编辑笔记时添加标签，就能在这里看到啦" />
         ) : (
           <>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -126,7 +126,7 @@ export function TagsPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState icon={<CloverIcon size={72} />} title="没有相关笔记" />
+                <EmptyState icon={<KleeAvatar size={72} />} title="没有相关笔记" />
               )
             ) : (
               <div className="p-4 rounded-card bg-white dark:bg-gray-800 text-center">
