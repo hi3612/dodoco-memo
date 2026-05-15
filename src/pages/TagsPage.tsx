@@ -129,8 +129,9 @@ export function TagsPage() {
                 <EmptyState icon={<KleeAvatar size={72} />} title="没有相关笔记" />
               )
             ) : (
-              <div className="p-4 rounded-card bg-white dark:bg-gray-800 text-center">
-                <p className="text-sm text-gray-400">点击上方标签查看对应笔记</p>
+              <div className="flex flex-col items-center py-12">
+                <KleeAvatar size={80} />
+                <p className="text-sm text-gray-400 mt-4">点击上方标签查看对应笔记</p>
               </div>
             )}
           </>
