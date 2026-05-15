@@ -90,11 +90,11 @@ export function HomePage() {
       <div className="pb-6">
         {loading && notes.length === 0 ? (
           <div className="flex items-center justify-center py-20">
-            <span className="animate-bounce"><KleeAvatar size={48} /></span>
+            <span className="animate-bounce"><KleeAvatar size={64} /></span>
           </div>
         ) : notes.length === 0 && pinnedNotes.length === 0 ? (
           <EmptyState
-            icon={<KleeAvatar size={72} />}
+            icon={<KleeAvatar size={96} />}
             title="还没有笔记哦"
             description="点击右上角 + 号，和可莉一起记录吧！"
           />

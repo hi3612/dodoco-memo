@@ -140,7 +140,7 @@ export function SettingsPage() {
 
         {/* App Info */}
         <div className="pt-6 text-center">
-          <KleeAvatar size={36} className="mx-auto" />
+          <KleeAvatar size={56} className="mx-auto" />
           <p className="text-xs text-gray-400 mt-1">嘟嘟可备忘录 v1.0</p>
           <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">和可莉一起记录每一天 ✨</p>
         </div>
