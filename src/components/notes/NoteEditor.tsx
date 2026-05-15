@@ -35,7 +35,7 @@ export function NoteEditor({ content, onChange }: NoteEditorProps) {
   // 编辑已有笔记时同步 content
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content, false)
+      editor.commands.setContent(content, { emitUpdate: false })
     }
   }, [content, editor])
 

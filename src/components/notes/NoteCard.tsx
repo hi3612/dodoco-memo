@@ -123,9 +123,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
             onClick={(e) => { e.stopPropagation(); setShowDelete(true) }}
             className="absolute top-2 right-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity"
             style={{ opacity: 0 }}
-            onTouchEnd={(e) => {
-              // 通过长按后的点击触发
-            }}
+            onTouchEnd={() => {}}
           >
             <Trash2 size={14} />
           </button>
