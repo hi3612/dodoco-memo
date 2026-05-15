@@ -21,6 +21,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
   const navigate = useNavigate()
   const refresh = useNoteStore(s => s.refresh)
   const refreshTags = useTagStore(s => s.refresh)
+  const [showCardActions, setShowCardActions] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -35,6 +36,8 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
       if (selectMode) return
       if (note.id != null && onEnterSelectMode) {
         onEnterSelectMode(note.id)
+      } else {
+        setShowCardActions(true)
       }
     }, 600)
   }, [selectMode, note.id, onEnterSelectMode])
@@ -47,6 +50,10 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
   }, [])
 
   const handleClick = () => {
+    if (showCardActions) {
+      setShowCardActions(false)
+      return
+    }
     if (selectMode && note.id != null && onToggleSelect) {
       onToggleSelect(note.id)
       return
@@ -62,6 +69,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
       showToast('已移至回收站')
     }
     setShowDelete(false)
+    setShowCardActions(false)
   }
 
   return (
@@ -74,13 +82,16 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
         onContextMenu={(e) => {
           if (selectMode) return
           e.preventDefault()
-          if (note.id != null && onEnterSelectMode) onEnterSelectMode(note.id)
+          if (note.id != null && onEnterSelectMode) {
+            onEnterSelectMode(note.id)
+          } else {
+            setShowCardActions(true)
+          }
         }}
         className={`${color.bg} rounded-card p-4 shadow-sm border border-black/5 dark:border-white/5 cursor-pointer active:scale-[0.98] transition-transform relative select-none ${
           selected ? 'ring-2 ring-klee-red' : ''
         }`}
       >
-        {/* 选择模式下的勾选框 */}
         {selectMode && (
           <div className="absolute top-3 left-3 z-10">
             {selected ? (
@@ -91,11 +102,11 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
           </div>
         )}
 
-        {note.isPinned && !selectMode && (
+        {note.isPinned && !selectMode && !showCardActions && (
           <Pin size={14} className="absolute top-3 right-3 text-klee-red rotate-45" fill="currentColor" />
         )}
 
-        <h3 className={`font-bold text-sm text-klee-brown dark:text-gray-900 mb-1.5 line-clamp-2 ${selectMode ? 'pr-0' : 'pr-5'}`}>
+        <h3 className="font-bold text-sm text-klee-brown dark:text-gray-900 mb-1.5 line-clamp-2 pr-5">
           {displayTitle}
         </h3>
 
@@ -117,16 +128,16 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
           <span className="text-[10px] text-gray-400 shrink-0">{timeStr}</span>
         </div>
 
-        {/* 普通模式下的长按删除按钮 */}
-        {!selectMode && (
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowDelete(true) }}
-            className="absolute top-2 right-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ opacity: 0 }}
-            onTouchEnd={() => {}}
-          >
-            <Trash2 size={14} />
-          </button>
+        {/* 长按出现的删除蒙层 */}
+        {showCardActions && (
+          <div className="absolute inset-0 bg-black/10 dark:bg-white/5 rounded-card flex items-center justify-center">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDelete(true) }}
+              className="flex items-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-xl text-sm font-medium shadow-lg"
+            >
+              <Trash2 size={16} /> 删除笔记
+            </button>
+          </div>
         )}
       </div>
 
