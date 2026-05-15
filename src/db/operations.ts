@@ -63,6 +63,20 @@ export async function batchArchiveNotes(ids: number[]): Promise<void> {
   await db.notes.bulkUpdate(ids.map(id => ({ key: id, changes: { isArchived: true, updatedAt: now } })))
 }
 
+export async function batchRestoreNotes(ids: number[]): Promise<void> {
+  const now = Date.now()
+  await db.notes.bulkUpdate(ids.map(id => ({ key: id, changes: { isTrashed: false, isArchived: false, updatedAt: now } })))
+}
+
+export async function batchUnarchiveNotes(ids: number[]): Promise<void> {
+  const now = Date.now()
+  await db.notes.bulkUpdate(ids.map(id => ({ key: id, changes: { isArchived: false, updatedAt: now } })))
+}
+
+export async function batchDeleteForever(ids: number[]): Promise<void> {
+  await db.notes.bulkDelete(ids)
+}
+
 export async function archiveNote(id: number): Promise<number> {
   return db.notes.update(id, { isArchived: true, updatedAt: Date.now() })
 }

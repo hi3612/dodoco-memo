@@ -1,13 +1,16 @@
-import { Trash2, X, Archive } from 'lucide-react'
+import { Trash2, X, Archive, Undo2 } from 'lucide-react'
 
 interface SelectionBarProps {
   count: number
   onDelete: () => void
-  onArchive: () => void
   onCancel: () => void
+  onArchive?: () => void
+  onRestore?: () => void
+  deleteLabel?: string
+  secondLabel?: string
 }
 
-export function SelectionBar({ count, onDelete, onArchive, onCancel }: SelectionBarProps) {
+export function SelectionBar({ count, onDelete, onCancel, onArchive, onRestore, deleteLabel = '删除', secondLabel = '归档' }: SelectionBarProps) {
   return (
     <div className="fixed bottom-14 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <div className="mx-4 w-full max-w-mobile bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between pointer-events-auto">
@@ -20,11 +23,18 @@ export function SelectionBar({ count, onDelete, onArchive, onCancel }: Selection
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onArchive} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-300">
-            <Archive size={16} /> 归档
-          </button>
+          {onRestore && (
+            <button onClick={onRestore} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-klee-red/10 text-klee-red text-sm font-medium">
+              <Undo2 size={16} /> {secondLabel}
+            </button>
+          )}
+          {onArchive && (
+            <button onClick={onArchive} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-300">
+              <Archive size={16} /> {secondLabel}
+            </button>
+          )}
           <button onClick={onDelete} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500 text-white text-sm font-medium">
-            <Trash2 size={16} /> 删除
+            <Trash2 size={16} /> {deleteLabel}
           </button>
         </div>
       </div>
