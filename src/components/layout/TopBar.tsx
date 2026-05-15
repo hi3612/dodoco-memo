@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { CloverIcon } from '@/components/ui/CloverIcon'
 
 interface TopBarProps {
   title?: string
@@ -26,7 +27,7 @@ export function TopBar({ title, showBack, action }: TopBarProps) {
               <ArrowLeft size={22} className="text-klee-brown dark:text-white" />
             </button>
           ) : isHome ? (
-            <span className="text-3xl">🍀</span>
+            <CloverIcon size={28} />
           ) : null}
           <h1 className="text-lg font-bold text-klee-brown dark:text-white truncate">
             {displayTitle}

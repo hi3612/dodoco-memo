@@ -138,3 +138,68 @@ body {
 input, textarea {
   background: transparent;
 }
+
+/* ===== 深色模式星空背景 ===== */
+@keyframes galaxyFlow {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(3%, 2%);
+  }
+  50% {
+    transform: translate(1%, -1%);
+  }
+  75% {
+    transform: translate(-2%, 1%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  75% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes meteorFall {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+    transform: translate(8vw, 10vh) scale(1);
+  }
+  5% {
+    opacity: 0.9;
+    transform: translate(20vw, 25vh) scale(0.9);
+  }
+  10% {
+    opacity: 0.6;
+    transform: translate(40vw, 50vh) scale(0.7);
+  }
+  15% {
+    opacity: 0.3;
+    transform: translate(60vw, 70vh) scale(0.4);
+  }
+  20% {
+    opacity: 0;
+    transform: translate(80vw, 95vh) scale(0.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(80vw, 95vh) scale(0);
+  }
+}

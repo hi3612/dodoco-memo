@@ -3,6 +3,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { TagChip } from '@/components/tags/TagChip'
 import { NoteGrid } from '@/components/notes/NoteGrid'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { CloverIcon } from '@/components/ui/CloverIcon'
 import { useTagStore } from '@/stores/tagStore'
 import { getNotesByTag } from '@/db/operations'
 import type { Note } from '@/types'
@@ -29,10 +30,10 @@ export function TagsPage() {
       <div className="px-4 pb-6">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <span className="text-2xl animate-spin">🍀</span>
+            <span className="animate-spin"><CloverIcon size={32} /></span>
           </div>
         ) : tags.length === 0 ? (
-          <EmptyState icon="🏷️" title="还没有标签" description="在编辑笔记时添加标签，就能在这里看到啦" />
+          <EmptyState icon={<CloverIcon size={72} />} title="还没有标签" description="在编辑笔记时添加标签，就能在这里看到啦" />
         ) : (
           <>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -61,15 +62,13 @@ export function TagsPage() {
                 {filteredNotes.length > 0 ? (
                   <NoteGrid notes={filteredNotes} />
                 ) : (
-                  <EmptyState icon="🍀" title="没有相关笔记" />
+                  <EmptyState icon={<CloverIcon size={72} />} title="没有相关笔记" />
                 )}
               </div>
             )}
 
             {!selectedTag && (
-              <div
-                className="p-4 rounded-card bg-white dark:bg-gray-800 text-center"
-              >
+              <div className="p-4 rounded-card bg-white dark:bg-gray-800 text-center">
                 <p className="text-sm text-gray-400">点击上方标签查看对应笔记</p>
               </div>
             )}

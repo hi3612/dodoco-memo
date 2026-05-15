@@ -19,6 +19,7 @@ export const useNoteStore = create<NoteState>((set) => ({
       ops.getAllNotes(),
       ops.getPinnedNotes(),
     ])
+    console.log('[首页] 刷新完成, 笔记数:', notes.length, '置顶数:', pinnedNotes.length, '笔记:', notes)
     set({ notes, pinnedNotes, loading: false })
   },
 }))

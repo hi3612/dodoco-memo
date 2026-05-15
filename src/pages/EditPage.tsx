@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Trash2, Archive, Pin, MoreHorizontal } from 'lucide-react'
+import { Trash2, Archive, Pin, MoreHorizontal, Check } from 'lucide-react'
 import { getNoteById, createNote, updateNote, archiveNote, unarchiveNote, trashNote } from '@/db/operations'
 import { useNoteStore } from '@/stores/noteStore'
 import { useTagStore } from '@/stores/tagStore'
@@ -36,42 +36,94 @@ export function EditPage() {
       getNoteById(Number(id)).then(n => {
         if (n) setNote(n)
       })
+    } else {
+      setNote({
+        title: '',
+        content: '',
+        plainText: '',
+        color: 'default',
+        isPinned: false,
+        isArchived: false,
+        tags: [],
+      })
     }
   }, [id])
 
-  const save = useCallback(async () => {
-    const current = noteRef.current
-    if (!current.title && !current.plainText && !current.content) return
-    if (id) {
-      await updateNote(Number(id), current)
-    } else {
-      const now = Date.now()
-      const newId = await createNote({
-        title: current.title || '',
-        content: current.content || '',
-        plainText: current.plainText || '',
-        color: current.color || 'default',
-        isPinned: current.isPinned || false,
-        isArchived: false,
-        isTrashed: false,
-        tags: current.tags || [],
-        createdAt: now,
-        updatedAt: now,
-      })
-      navigate(`/edit/${newId}`, { replace: true })
-    }
-    refresh()
-    refreshTags()
-  }, [id, navigate, refresh, refreshTags])
-
   const noteRef = useRef(note)
   noteRef.current = note
+  const idRef = useRef(id)
+  idRef.current = id
 
-  // Auto-save
+  // 纯保存：只写数据库，不跳转
+  const doSave = useCallback(async (): Promise<number | undefined> => {
+    const current = noteRef.current
+    const currentId = idRef.current
+    console.log('[保存] 开始保存, id:', currentId, '标题:', current.title, '正文:', current.plainText?.slice(0, 20))
+    try {
+      if (currentId) {
+        await updateNote(Number(currentId), current)
+        console.log('[保存] 更新成功, id:', currentId)
+        refresh()
+        refreshTags()
+        return Number(currentId)
+      } else {
+        const now = Date.now()
+        const newId = await createNote({
+          title: current.title || '',
+          content: current.content || '',
+          plainText: current.plainText || '',
+          color: current.color || 'default',
+          isPinned: current.isPinned || false,
+          isArchived: false,
+          isTrashed: false,
+          tags: current.tags || [],
+          createdAt: now,
+          updatedAt: now,
+        })
+        refresh()
+        refreshTags()
+        console.log('[保存] 创建成功, newId:', newId)
+        return newId
+      }
+    } catch (err) {
+      console.error('[保存] 失败:', err)
+      showToast('保存失败，请重试')
+    }
+  }, [refresh, refreshTags])
+
+  // 自动保存：保存后静默更新 URL
+  const save = useCallback(async () => {
+    const current = noteRef.current
+    if (!current.title?.trim() && !current.plainText?.trim() && !current.content?.replace(/<[^>]+>/g, '').trim()) return
+    const resultId = await doSave()
+    const currentId = idRef.current
+    if (!currentId && resultId) {
+      // 新笔记自动保存后，静默更新 URL，不触发重新加载
+      window.history.replaceState(null, '', `/edit/${resultId}`)
+    }
+  }, [doSave])
+
+  // 自动保存定时器
   useEffect(() => {
-    const t = setTimeout(save, 1500)
+    const t = setTimeout(() => save(), 1500)
     return () => clearTimeout(t)
-  }, [note.content, note.title, note.plainText])
+  }, [save])
+
+  const handleDone = async () => {
+    const current = noteRef.current
+    console.log('[完成] 点击完成按钮, 标题:', current.title, '正文:', current.plainText?.slice(0, 20))
+    if (!current.title?.trim() && !current.plainText?.trim() && !current.content?.replace(/<[^>]+>/g, '').trim()) {
+      console.log('[完成] 内容为空，直接返回首页')
+      navigate('/', { replace: true })
+      return
+    }
+    const resultId = await doSave()
+    console.log('[完成] doSave 返回:', resultId)
+    if (resultId !== undefined) {
+      showToast('已保存')
+    }
+    navigate('/', { replace: true })
+  }
 
   const handleDelete = async () => {
     if (id) {
@@ -100,9 +152,8 @@ export function EditPage() {
     }
   }
 
-  const togglePin = async () => {
-    const newPinned = !note.isPinned
-    setNote(prev => ({ ...prev, isPinned: newPinned }))
+  const togglePin = () => {
+    setNote(prev => ({ ...prev, isPinned: !prev.isPinned }))
   }
 
   const addTag = () => {
@@ -124,7 +175,10 @@ export function EditPage() {
         title={id ? '编辑笔记' : '新建笔记'}
         action={
           <div className="flex items-center gap-1">
-            <button onClick={togglePin} className={`p-2 rounded-full ${note.isPinned ? 'text-klee-red' : 'text-gray-400'}`}>
+            <button onClick={handleDone} className="px-3 py-1.5 rounded-lg bg-klee-red text-white text-sm font-medium">
+              <Check size={16} className="inline mr-1" />完成
+            </button>
+            <button onClick={togglePin} className={`p-2 rounded-full ${note.isPinned ? 'text-klee-red' : 'text-gray-400'}`} title="置顶">
               <Pin size={18} fill={note.isPinned ? 'currentColor' : 'none'} />
             </button>
             {id && (
@@ -148,7 +202,6 @@ export function EditPage() {
       )}
 
       <div className="px-4 pb-6 space-y-4">
-        {/* Title */}
         <input
           type="text"
           value={note.title || ''}
@@ -157,13 +210,11 @@ export function EditPage() {
           className="w-full text-xl font-bold text-klee-brown dark:text-white bg-transparent placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none px-1"
         />
 
-        {/* Editor */}
         <NoteEditor
           content={note.content || ''}
           onChange={(html, plainText) => setNote(prev => ({ ...prev, content: html, plainText }))}
         />
 
-        {/* Color Picker */}
         <div>
           <p className="text-xs text-gray-400 mb-2 font-medium">笔记颜色</p>
           <ColorPicker
@@ -172,7 +223,6 @@ export function EditPage() {
           />
         </div>
 
-        {/* Tags */}
         <div>
           <p className="text-xs text-gray-400 mb-2 font-medium">标签</p>
           <div className="flex gap-1.5 flex-wrap mb-2">
