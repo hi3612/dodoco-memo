@@ -69,7 +69,17 @@ export function ArchivePage() {
 
   return (
     <div className="min-h-[calc(100vh-56px)]">
-      <TopBar showBack title="归档" />
+      <TopBar
+          showBack
+          title={selectMode ? `已选 ${selectedIds.size} 项` : '归档'}
+          action={
+            selectMode ? (
+              <button onClick={cancelSelect} className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500">
+                取消
+              </button>
+            ) : undefined
+          }
+        />
 
       <div className="pb-6">
         {loading ? (
@@ -79,9 +89,9 @@ export function ArchivePage() {
         ) : notes.length === 0 ? (
           <EmptyState icon={<KleeAvatar size={72} />} title="归档为空" description="归档的笔记会出现在这里" />
         ) : (
-          <div className="columns-2 gap-3 px-4">
+          <div className="grid grid-cols-2 gap-3 px-4">
             {notes.map(note => (
-              <div key={note.id} className="break-inside-avoid mb-3">
+              <div key={note.id}>
                 <NoteCard
                   note={note}
                   selectMode={selectMode}

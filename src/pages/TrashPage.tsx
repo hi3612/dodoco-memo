@@ -69,7 +69,17 @@ export function TrashPage() {
 
   return (
     <div className="min-h-[calc(100vh-56px)]">
-      <TopBar showBack title="回收站" />
+      <TopBar
+          showBack
+          title={selectMode ? `已选 ${selectedIds.size} 项` : '回收站'}
+          action={
+            selectMode ? (
+              <button onClick={cancelSelect} className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500">
+                取消
+              </button>
+            ) : undefined
+          }
+        />
 
       <div className="pb-6">
         {loading ? (
@@ -79,9 +89,9 @@ export function TrashPage() {
         ) : notes.length === 0 ? (
           <EmptyState icon={<KleeAvatar size={72} />} title="回收站为空" description="删除的笔记会在这里保留30天" />
         ) : (
-          <div className="columns-2 gap-3 px-4">
+          <div className="grid grid-cols-2 gap-3 px-4">
             {notes.map(note => (
-              <div key={note.id} className="break-inside-avoid mb-3">
+              <div key={note.id}>
                 <NoteCard
                   note={note}
                   selectMode={selectMode}
