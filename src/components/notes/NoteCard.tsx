@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Pin, Trash2, CheckCircle, Circle } from 'lucide-react'
 import type { Note } from '@/types'
@@ -24,6 +24,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
   const [showCardActions, setShowCardActions] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressRef = useRef(false)
 
   const color = NOTE_COLORS[note.color as keyof typeof NOTE_COLORS] || NOTE_COLORS.default
   const preview = note.plainText || note.title || '空白的笔记…'
@@ -31,8 +32,22 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
   const time = new Date(note.updatedAt)
   const timeStr = time.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 
+  // 点击空白处关闭蒙层
+  useEffect(() => {
+    if (!showCardActions) return
+    const close = () => { setShowCardActions(false); longPressRef.current = false }
+    // 延迟绑定，避免长按的 touchend 马上触发关闭
+    const t = setTimeout(() => document.addEventListener('click', close), 100)
+    return () => {
+      clearTimeout(t)
+      document.removeEventListener('click', close)
+    }
+  }, [showCardActions])
+
   const startPress = useCallback(() => {
+    longPressRef.current = false
     timerRef.current = setTimeout(() => {
+      longPressRef.current = true
       if (selectMode) return
       if (note.id != null && onEnterSelectMode) {
         onEnterSelectMode(note.id)
@@ -49,9 +64,17 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
     }
   }, [])
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // 长按后蒙层已显示 → 点卡片关闭蒙层
     if (showCardActions) {
       setShowCardActions(false)
+      longPressRef.current = false
+      e.stopPropagation()
+      return
+    }
+    if (longPressRef.current) {
+      longPressRef.current = false
+      e.stopPropagation()
       return
     }
     if (selectMode && note.id != null && onToggleSelect) {
@@ -70,6 +93,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
     }
     setShowDelete(false)
     setShowCardActions(false)
+    longPressRef.current = false
   }
 
   return (
@@ -82,6 +106,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
         onContextMenu={(e) => {
           if (selectMode) return
           e.preventDefault()
+          longPressRef.current = true
           if (note.id != null && onEnterSelectMode) {
             onEnterSelectMode(note.id)
           } else {
@@ -128,7 +153,6 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
           <span className="text-[10px] text-gray-400 shrink-0">{timeStr}</span>
         </div>
 
-        {/* 长按出现的删除蒙层 */}
         {showCardActions && (
           <div className="absolute inset-0 bg-black/10 dark:bg-white/5 rounded-card flex items-center justify-center">
             <button
