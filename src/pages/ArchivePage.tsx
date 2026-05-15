@@ -89,7 +89,7 @@ export function ArchivePage() {
         ) : notes.length === 0 ? (
           <EmptyState icon={<KleeAvatar size={72} />} title="归档为空" description="归档的笔记会出现在这里" />
         ) : (
-          <div className="grid grid-cols-2 gap-3 px-4">
+          <div className="grid grid-cols-2 gap-3 px-4 pt-0.5">
             {notes.map(note => (
               <div key={note.id}>
                 <NoteCard

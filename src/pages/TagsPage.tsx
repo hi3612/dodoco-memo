@@ -112,7 +112,7 @@ export function TagsPage() {
 
             {selectedTag ? (
               filteredNotes.length > 0 ? (
-                <div className="columns-2 gap-3">
+                <div className="columns-2 gap-3 pt-0.5">
                   {filteredNotes.map(note => (
                     <div key={note.id} className="break-inside-avoid mb-3">
                       <NoteCard

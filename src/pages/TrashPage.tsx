@@ -89,7 +89,7 @@ export function TrashPage() {
         ) : notes.length === 0 ? (
           <EmptyState icon={<KleeAvatar size={72} />} title="回收站为空" description="删除的笔记会在这里保留30天" />
         ) : (
-          <div className="grid grid-cols-2 gap-3 px-4">
+          <div className="grid grid-cols-2 gap-3 px-4 pt-0.5">
             {notes.map(note => (
               <div key={note.id}>
                 <NoteCard

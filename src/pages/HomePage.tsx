@@ -106,7 +106,7 @@ export function HomePage() {
                   <span className="text-xs">📌</span>
                   <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">置顶</h2>
                 </div>
-                <div className="columns-2 gap-3 px-4">
+                <div className="columns-2 gap-3 px-4 pt-0.5">
                   {pinnedNotes.map(note => (
                     <div key={note.id} className="break-inside-avoid mb-3">
                       <NoteCard
@@ -128,7 +128,7 @@ export function HomePage() {
                   <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">全部笔记</h2>
                 </div>
               )}
-              <div className="columns-2 gap-3 px-4">
+              <div className="columns-2 gap-3 px-4 pt-0.5">
                 {notes.map(note => (
                   <div key={note.id} className="break-inside-avoid mb-3">
                     <NoteCard
