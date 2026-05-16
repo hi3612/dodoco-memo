@@ -8,6 +8,7 @@ import { usePetAnimation } from '@/hooks/usePetAnimation'
 import { KLEE_QUOTES } from '@/data/kleeQuotes'
 
 const PET_SIZE = 80
+const CLICK_COOLDOWN = 400
 
 function getRandomQuote(): string {
   return KLEE_QUOTES[Math.floor(Math.random() * KLEE_QUOTES.length)]
@@ -15,13 +16,24 @@ function getRandomQuote(): string {
 
 export function DesktopPet() {
   const {
-    visible, x, y, dragging, speaking,
+    visible, x, y, dragging,
     setPosition, showSpeech, hideSpeech,
   } = usePetStore()
 
   const petRef = useRef<HTMLDivElement>(null)
   const [sparkle, setSparkle] = useState(false)
   const [appear, setAppear] = useState(false)
+  const speakingRef = useRef(false)
+  const cooldownRef = useRef(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Sync ref with store (one-way: store → ref)
+  useEffect(() => {
+    const unsub = usePetStore.subscribe((s) => {
+      speakingRef.current = s.speaking
+    })
+    return unsub
+  }, [])
 
   // Initialize default position
   useEffect(() => {
@@ -55,26 +67,29 @@ export function DesktopPet() {
 
   const dragHandlers = usePetDrag(petRef, visible)
 
-  // Click → toggle speech
+  // Stable click handler — uses refs, no state deps
   const handleClick = useCallback(() => {
-    if (dragging) return
-    if (speaking) {
+    if (cooldownRef.current) return
+    cooldownRef.current = true
+    setTimeout(() => { cooldownRef.current = false }, CLICK_COOLDOWN)
+
+    if (speakingRef.current) {
       hideSpeech()
+      if (timerRef.current) clearTimeout(timerRef.current)
     } else {
       showSpeech(getRandomQuote())
-      setTimeout(() => {
-        const s = usePetStore.getState()
-        if (s.speaking) s.hideSpeech()
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null
+        hideSpeech()
       }, 4000)
     }
-  }, [dragging, speaking, showSpeech, hideSpeech])
+  }, [showSpeech, hideSpeech])
 
   // Double-click → sparkle
   const handleDoubleClick = useCallback(() => {
-    if (dragging) return
     setSparkle(true)
     setTimeout(() => setSparkle(false), 800)
-  }, [dragging])
+  }, [])
 
   const transitionStyle = useMemo(() => {
     if (dragging) return 'none'
@@ -133,7 +148,7 @@ export function DesktopPet() {
         </div>
       )}
 
-      <KleeAvatar size={PET_SIZE} className="w-full h-full" />
+      <KleeAvatar size={PET_SIZE} className="w-full h-full pointer-events-none" />
     </div>,
     document.body
   )
