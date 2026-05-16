@@ -4,6 +4,7 @@ import { Sun, Moon, Grid3X3, List, Archive, Trash2, Download, Upload, Trash } fr
 import { TopBar } from '@/components/layout/TopBar'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { KleeAvatar } from '@/components/ui/KleeAvatar'
+import { PetToggle } from '@/components/pet/PetToggle'
 import { showToast } from '@/components/ui/Toast'
 import { useUIStore } from '@/stores/uiStore'
 import { useNoteStore } from '@/stores/noteStore'
@@ -86,6 +87,11 @@ export function SettingsPage() {
               <List size={18} /> 列表
             </button>
           </div>
+        </div>
+
+        {/* Desktop Pet */}
+        <div className="bg-white dark:bg-gray-800 rounded-card overflow-hidden">
+          <PetToggle />
         </div>
 
         {/* Archive & Trash */}

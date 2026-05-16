@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { StarryBg } from '@/components/ui/StarryBg'
+import { DesktopPet } from '@/components/pet/DesktopPet'
 import { HomePage } from '@/pages/HomePage'
 import { EditPage } from '@/pages/EditPage'
 import { SearchPage } from '@/pages/SearchPage'
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <StarryBg />
+      <DesktopPet />
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />
