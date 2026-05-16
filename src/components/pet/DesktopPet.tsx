@@ -50,7 +50,6 @@ export function DesktopPet() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const trailTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const trailIdRef = useRef(0)
-  const dragAngleRef = useRef(0)
 
   // Sync speaking ref
   useEffect(() => {
@@ -113,23 +112,12 @@ export function DesktopPet() {
 
   usePetAnimation()
 
-  const onDragStart = useCallback(() => {
-    dragAngleRef.current = 0
-  }, [])
-
   const onDragEnd = useCallback(() => {
     setBouncing(true)
     setTimeout(() => setBouncing(false), 400)
   }, [])
 
-  const drag = usePetDrag(petRef, visible, { onDragStart, onDragEnd })
-
-  // Track drag angle during move
-  const origMove = drag.onPointerMove
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    origMove(e)
-    dragAngleRef.current = drag.getDragAngle()
-  }, [origMove, drag])
+  const drag = usePetDrag(petRef, visible, { onDragEnd })
 
   const handleClick = useCallback(() => {
     if (speakingRef.current) {
@@ -161,11 +149,9 @@ export function DesktopPet() {
     if (bouncing) {
       style.animation = 'petBounce 0.4s ease-out'
       style.transformOrigin = 'center'
-    } else if (dragging) {
-      style.transform = `scale(1.15) rotate(${dragAngleRef.current}deg)`
     } else if (speaking) {
       style.animation = 'petPulse 0.8s ease-in-out infinite'
-    } else if (appear) {
+    } else if (appear && !dragging) {
       style.animation = 'petBob 3s ease-in-out infinite'
     }
 
@@ -194,7 +180,7 @@ export function DesktopPet() {
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       onPointerDown={drag.onPointerDown}
-      onPointerMove={onPointerMove}
+      onPointerMove={drag.onPointerMove}
       onPointerUp={drag.onPointerUp}
       className="
         fixed z-[9999]
