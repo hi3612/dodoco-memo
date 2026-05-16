@@ -4,12 +4,29 @@ import { usePetStore } from '@/stores/petStore'
 const PET_SIZE = 80
 const DRAG_THRESHOLD = 5
 
-export function usePetDrag(petRef: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
+export interface DragState {
+  dragging: boolean
+  angle: number
+  speed: number
+  onDragStart?: () => void
+  onDragEnd?: () => void
+}
+
+export function usePetDrag(
+  petRef: React.RefObject<HTMLDivElement | null>,
+  enabled: boolean,
+  callbacks?: { onDragStart?: () => void; onDragEnd?: () => void }
+) {
   const setPosition = usePetStore(s => s.setPosition)
   const setDragging = usePetStore(s => s.setDragging)
   const offsetRef = useRef({ dx: 0, dy: 0 })
   const startRef = useRef({ x: 0, y: 0 })
+  const prevRef = useRef({ x: 0, y: 0 })
   const movedRef = useRef(false)
+  const dragAngleRef = useRef(0)
+  const dragSpeedRef = useRef(0)
+  const callbacksRef = useRef(callbacks)
+  callbacksRef.current = callbacks
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     if (!enabled) return
@@ -23,7 +40,10 @@ export function usePetDrag(petRef: React.RefObject<HTMLDivElement | null>, enabl
       dy: e.clientY - rect.top,
     }
     startRef.current = { x: e.clientX, y: e.clientY }
+    prevRef.current = { x: e.clientX, y: e.clientY }
     movedRef.current = false
+    dragAngleRef.current = 0
+    dragSpeedRef.current = 0
     e.preventDefault()
     e.stopPropagation()
   }, [enabled, petRef])
@@ -39,7 +59,15 @@ export function usePetDrag(petRef: React.RefObject<HTMLDivElement | null>, enabl
     if (!movedRef.current) {
       movedRef.current = true
       setDragging(true)
+      callbacksRef.current?.onDragStart?.()
     }
+
+    // Track direction & speed
+    const pdx = e.clientX - prevRef.current.x
+    const pdy = e.clientY - prevRef.current.y
+    dragAngleRef.current = Math.atan2(pdy, pdx) * (180 / Math.PI)
+    dragSpeedRef.current = Math.sqrt(pdx * pdx + pdy * pdy)
+    prevRef.current = { x: e.clientX, y: e.clientY }
 
     const newX = e.clientX - offsetRef.current.dx
     const newY = e.clientY - offsetRef.current.dy
@@ -57,8 +85,12 @@ export function usePetDrag(petRef: React.RefObject<HTMLDivElement | null>, enabl
     if (el) el.releasePointerCapture(e.pointerId)
     if (movedRef.current) {
       setDragging(false)
+      callbacksRef.current?.onDragEnd?.()
     }
   }, [petRef, setDragging])
 
-  return { onPointerDown, onPointerMove, onPointerUp }
+  const getDragAngle = useCallback(() => dragAngleRef.current, [])
+  const getDragSpeed = useCallback(() => dragSpeedRef.current, [])
+
+  return { onPointerDown, onPointerMove, onPointerUp, getDragAngle, getDragSpeed }
 }

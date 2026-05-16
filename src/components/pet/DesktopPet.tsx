@@ -8,32 +8,80 @@ import { usePetAnimation } from '@/hooks/usePetAnimation'
 import { KLEE_QUOTES } from '@/data/kleeQuotes'
 
 const PET_SIZE = 80
-const CLICK_COOLDOWN = 400
 
 function getRandomQuote(): string {
   return KLEE_QUOTES[Math.floor(Math.random() * KLEE_QUOTES.length)]
 }
 
+function TrailParticle({ tx, ty }: { tx: number; ty: number }) {
+  const angle = Math.random() * 360
+  const dist = 20 + Math.random() * 30
+  const rx = Math.cos(angle * Math.PI / 180) * dist
+  const ry = Math.sin(angle * Math.PI / 180) * dist - 10
+  const size = 3 + Math.random() * 4
+  return (
+    <div
+      className="absolute rounded-full pointer-events-none bg-klee-gold"
+      style={{
+        width: size,
+        height: size,
+        left: tx,
+        top: ty,
+        '--tx': `${rx}px`,
+        '--ty': `${ry}px`,
+        animation: 'trailFade 0.6s ease-out forwards',
+      } as React.CSSProperties}
+    />
+  )
+}
+
 export function DesktopPet() {
   const {
-    visible, x, y, dragging,
+    visible, x, y, dragging, speaking,
     setPosition, showSpeech, hideSpeech,
   } = usePetStore()
 
   const petRef = useRef<HTMLDivElement>(null)
   const [sparkle, setSparkle] = useState(false)
   const [appear, setAppear] = useState(false)
+  const [bouncing, setBouncing] = useState(false)
+  const [trails, setTrails] = useState<{ id: number; tx: number; ty: number }[]>([])
   const speakingRef = useRef(false)
-  const cooldownRef = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const trailTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const trailIdRef = useRef(0)
+  const dragAngleRef = useRef(0)
 
-  // Sync ref with store (one-way: store → ref)
+  // Sync speaking ref
   useEffect(() => {
     const unsub = usePetStore.subscribe((s) => {
       speakingRef.current = s.speaking
     })
     return unsub
   }, [])
+
+  // Trail particles during drag
+  useEffect(() => {
+    if (dragging) {
+      trailTimerRef.current = setInterval(() => {
+        setTrails(prev => {
+          const next = [...prev, { id: trailIdRef.current++, tx: PET_SIZE / 2, ty: PET_SIZE / 2 }]
+          return next.slice(-12)
+        })
+      }, 80)
+    } else {
+      if (trailTimerRef.current) {
+        clearInterval(trailTimerRef.current)
+        trailTimerRef.current = null
+      }
+      // Clean up trails after drag ends
+      const cleanup = setTimeout(() => setTrails([]), 600)
+      return () => clearTimeout(cleanup)
+    }
+    return () => {
+      if (trailTimerRef.current) clearInterval(trailTimerRef.current)
+    }
+  }, [dragging])
 
   // Initialize default position
   useEffect(() => {
@@ -65,14 +113,25 @@ export function DesktopPet() {
 
   usePetAnimation()
 
-  const dragHandlers = usePetDrag(petRef, visible)
+  const onDragStart = useCallback(() => {
+    dragAngleRef.current = 0
+  }, [])
 
-  // Stable click handler — uses refs, no state deps
+  const onDragEnd = useCallback(() => {
+    setBouncing(true)
+    setTimeout(() => setBouncing(false), 400)
+  }, [])
+
+  const drag = usePetDrag(petRef, visible, { onDragStart, onDragEnd })
+
+  // Track drag angle during move
+  const origMove = drag.onPointerMove
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    origMove(e)
+    dragAngleRef.current = drag.getDragAngle()
+  }, [origMove, drag])
+
   const handleClick = useCallback(() => {
-    if (cooldownRef.current) return
-    cooldownRef.current = true
-    setTimeout(() => { cooldownRef.current = false }, CLICK_COOLDOWN)
-
     if (speakingRef.current) {
       hideSpeech()
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -85,16 +144,44 @@ export function DesktopPet() {
     }
   }, [showSpeech, hideSpeech])
 
-  // Double-click → sparkle
   const handleDoubleClick = useCallback(() => {
     setSparkle(true)
     setTimeout(() => setSparkle(false), 800)
   }, [])
 
-  const transitionStyle = useMemo(() => {
-    if (dragging) return 'none'
-    return 'left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
-  }, [dragging])
+  // Compute visual state
+  const visualStyle = useMemo(() => {
+    const style: React.CSSProperties = {
+      width: PET_SIZE,
+      height: PET_SIZE,
+      borderRadius: '50%',
+      transition: 'none',
+    }
+
+    if (bouncing) {
+      style.animation = 'petBounce 0.4s ease-out'
+      style.transformOrigin = 'center'
+    } else if (dragging) {
+      style.transform = `scale(1.15) rotate(${dragAngleRef.current}deg)`
+    } else if (speaking) {
+      style.animation = 'petPulse 0.8s ease-in-out infinite'
+    } else if (appear) {
+      style.animation = 'petBob 3s ease-in-out infinite'
+    }
+
+    return style
+  }, [dragging, speaking, bouncing, appear])
+
+  // Drop shadow style
+  const shadowStyle = useMemo(() => {
+    if (dragging) {
+      return 'drop-shadow(0 0 16px rgba(255,180,100,0.6)) drop-shadow(0 4px 12px rgba(0,0,0,0.3))'
+    }
+    if (speaking) {
+      return 'drop-shadow(0 0 10px rgba(255,180,100,0.4)) drop-shadow(0 2px 8px rgba(0,0,0,0.15))'
+    }
+    return 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))'
+  }, [dragging, speaking])
 
   if (!visible) return null
 
@@ -106,26 +193,31 @@ export function DesktopPet() {
       aria-label="可莉桌宠"
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
-      {...dragHandlers}
+      onPointerDown={drag.onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={drag.onPointerUp}
       className="
         fixed z-[9999]
         touch-none select-none
         cursor-grab active:cursor-grabbing
+        flex items-center justify-center
       "
       style={{
         left: x >= 0 ? `${x}px` : undefined,
         top: y >= 0 ? `${y}px` : undefined,
         width: PET_SIZE,
         height: PET_SIZE,
-        transition: transitionStyle,
-        animation: dragging
+        transition: dragging
           ? 'none'
-          : appear
-            ? 'petBob 3s ease-in-out infinite'
-            : 'none',
+          : 'left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
         opacity: appear ? 1 : 0,
       }}
     >
+      {/* Trail particles */}
+      {trails.map(t => (
+        <TrailParticle key={t.id} tx={t.tx} ty={t.ty} />
+      ))}
+
       <SpeechBubble />
 
       {/* Sparkle burst */}
@@ -148,7 +240,13 @@ export function DesktopPet() {
         </div>
       )}
 
-      <KleeAvatar size={PET_SIZE} className="w-full h-full pointer-events-none" />
+      {/* Avatar wrapper with visual state */}
+      <div
+        className="rounded-full overflow-hidden"
+        style={{ ...visualStyle, filter: shadowStyle }}
+      >
+        <KleeAvatar size={PET_SIZE} className="w-full h-full pointer-events-none" />
+      </div>
     </div>,
     document.body
   )
