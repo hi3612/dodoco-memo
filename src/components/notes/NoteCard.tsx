@@ -48,6 +48,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
     longPressRef.current = false
     if (timerRef.current) clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => {
+      if (longPressRef.current) return // already handled by contextmenu
       longPressRef.current = true
       if (selectMode) return
       if (note.id != null && onEnterSelectMode) {
@@ -107,6 +108,7 @@ export function NoteCard({ note, selectMode, selected, onToggleSelect, onEnterSe
         onContextMenu={(e) => {
           if (selectMode) return
           e.preventDefault()
+          if (longPressRef.current) return // already handled by timer
           if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null }
           longPressRef.current = true
           if (note.id != null && onEnterSelectMode) {
